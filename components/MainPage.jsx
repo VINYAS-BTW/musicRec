@@ -4,8 +4,19 @@ import { motion } from "framer-motion";
 import { Music, Sparkles, TrendingUp, ArrowLeft } from "lucide-react";
 import MusicRow from "../components/MusicrRow";
 
-export default function MainPage({ username, preferences, onGoBack }) {
-  const [recommendations] = useState([
+
+
+
+export default function MainPage({  username,
+  preferences,
+  recommendations,
+  newRecommendations,
+  loadingRecommendations,
+  loadingNewRecommendations,
+  onGoBack,
+  onLike,
+  onDislike, }) {
+  /*const [recommendations,setRecommdations] = useState([
     "Summer Vibes",
     "Midnight Jazz",
     "Workout Energy",
@@ -14,7 +25,7 @@ export default function MainPage({ username, preferences, onGoBack }) {
     "Focus Mode",
   ]);
 
-  const [newMusic] = useState([
+  const [newMusic,setnewMusic] = useState([
     "Cosmic Dreams",
     "Urban Pulse",
     "Ocean Waves",
@@ -22,7 +33,9 @@ export default function MainPage({ username, preferences, onGoBack }) {
     "Neon Lights",
     "Desert Wind",
   ]);
+  */
 
+  
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -79,11 +92,20 @@ export default function MainPage({ username, preferences, onGoBack }) {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.7 }}
         >
-          <MusicRow
-            title="Based on Your Preferences"
-            items={recommendations}
-            icon={Sparkles}
-          />
+          {loadingRecommendations ? (
+            <div className="flex items-center justify-center py-10">
+              <span className="animate-spin mr-2">🎵</span>
+              <span>Loading recommendations...</span>
+            </div>
+          ) : (
+            <MusicRow
+              title="Based on Your Preferences"
+              items={recommendations}
+              icon={Sparkles}
+              onLike={onLike}
+              onDislike={onDislike}
+            />
+          )}
         </motion.div>
 
         <motion.div
@@ -92,7 +114,20 @@ export default function MainPage({ username, preferences, onGoBack }) {
           transition={{ delay: 0.4, duration: 0.7 }}
           className="mt-10"
         >
-          <MusicRow title="Try Something New" items={newMusic} icon={TrendingUp} />
+          {loadingNewRecommendations ? (
+            <div className="flex items-center justify-center py-10">
+              <span className="animate-spin mr-2">✨</span>
+              <span>Loading something new...</span>
+            </div>
+          ) : (
+            <MusicRow
+              title="Try Something New"
+              items={newRecommendations}
+              icon={TrendingUp}
+              onLike={onLike}
+              onDislike={onDislike}
+            />
+          )}
         </motion.div>
       </div>
     </motion.div>

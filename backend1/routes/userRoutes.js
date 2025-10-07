@@ -71,4 +71,19 @@ router.get("/:username", async (req, res) => {
   }
 });
 
+router.post("/getPreferences", async (req, res) => {
+  try {
+    const { username } = req.body;
+    if (!username) return res.status(400).json({ error: "Username required" });
+
+    const user = await User.findOne({ username });
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    res.status(200).json({ preferences: user.preferences });
+  } catch (err) {
+    console.error("Get Preferences Error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 export default router;
