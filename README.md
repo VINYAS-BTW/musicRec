@@ -12,7 +12,9 @@ HOW TO RUN?
  mongo connected - if not then check with ur .env 
 
 FRONTEND:
-    cd MusicRec
-     npm run dev
+  new terminal
+
+   # cd MusicRec
+  # npm run dev
 
 ik its very worst!! 
