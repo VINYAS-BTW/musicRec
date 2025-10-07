@@ -27,7 +27,7 @@ export default function Preferences({ username, onContinue }) {
     );
   };
 
-  // ✅ Properly defined handler
+  //  Properly defined handler
   const handleContinue = async () => {
     if (selected.length === 0) return alert("Please select at least one genre");
     setLoading(true);
@@ -38,10 +38,10 @@ export default function Preferences({ username, onContinue }) {
         preferences: selected,
       });
 
-      console.log("✅ Preferences saved:", selected);
+      console.log(" Preferences saved:", selected);
       onContinue(selected); // ← Tell parent to move to MainPage
     } catch (err) {
-      console.error("❌ Error saving preferences:", err);
+      console.error(" Error saving preferences:", err);
       alert("Failed to save preferences — check backend.");
     } finally {
       setLoading(false);

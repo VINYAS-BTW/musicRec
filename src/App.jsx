@@ -9,7 +9,7 @@ export default function App() {
   const [username, setUsername] = useState("");
   const [preferences, setPreferences] = useState([]);
 
-  // ✅ When user logs in
+  //  When user logs in
   const handleLogin = async (name) => {
     try {
       const res = await fetch("http://localhost:5000/api/users/login", {
@@ -34,7 +34,7 @@ export default function App() {
     }
   };
 
-  // ✅ When user sets preferences
+  //  When user sets preferences
   const handlePreferences = async (selected) => {
     setPreferences(selected);
     try {
@@ -49,7 +49,7 @@ export default function App() {
     setCurrentPage("main");
   };
 
-  // ✅ When user goes back to login
+  //  When user goes back to login
   const handleGoBack = () => {
     setUsername("");
     setPreferences([]);

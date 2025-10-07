@@ -20,7 +20,7 @@ router.post("/login", async (req, res) => {
 
     res.status(200).json(user);
   } catch (err) {
-    console.error("❌ Login Error:", err);
+    console.error(" Login Error:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -47,7 +47,7 @@ router.post("/preferences", async (req, res) => {
 
     res.status(200).json(user);
   } catch (err) {
-    console.error("❌ Preferences Update Error:", err);
+    console.error(" Preferences Update Error:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
@@ -66,7 +66,7 @@ router.get("/:username", async (req, res) => {
 
     res.status(200).json(user);
   } catch (err) {
-    console.error("❌ Fetch User Error:", err);
+    console.error(" Fetch User Error:", err);
     res.status(500).json({ error: "Server error" });
   }
 });

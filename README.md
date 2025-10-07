@@ -18,3 +18,5 @@ FRONTEND:
   # npm run dev
 
 ik its very worst!! 
+
+## make sure .env is in backend1
