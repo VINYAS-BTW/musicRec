@@ -9,12 +9,12 @@ export default function App() {
   const [username, setUsername] = useState("");
   const [preferences, setPreferences] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
-  const [newRecommendations, setNewRecommendations] = useState([]); // NEW
+  const [newRecommendations, setNewRecommendations] = useState([]); 
   const [loadingRecommendations, setLoadingRecommendations] = useState(false);
  const [loadingNewRecommendations, setLoadingNewRecommendations] = useState(false);
- //const [dislikeCounts, setDislikeCounts] = useState({});
+ //const [dislikeCounts, setDislikeCounts] = useState({}); error barthidhe so ;)
 
-  // When user logs in
+  //  log in
   const handleLogin = async (name) => {
     try {
       const res = await fetch("http://localhost:5000/api/users/login", {
@@ -41,7 +41,7 @@ export default function App() {
     }
   };
 
-  // When user sets preferences
+  // pref select
   const handlePreferences = async (selected) => {
     setPreferences(selected);
     try {
@@ -58,17 +58,17 @@ export default function App() {
     setCurrentPage("main");
   };
 
-  // When user goes back to login
+  // mathe ba
   const handleGoBack = () => {
     setUsername("");
     setPreferences([]);
     setRecommendations([]);
-    setNewRecommendations([]); // NEW
+    setNewRecommendations([]); 
     setCurrentPage("login");
     localStorage.removeItem("username");
   };
 
-  // Fetch recommendations from Gemini
+  // namma rec fetching :)
   async function generateRecommendation(prefArr) {
     setLoadingRecommendations(true);
     console.log("Generating recommendations for preferences:", prefArr);
@@ -77,7 +77,7 @@ export default function App() {
       const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API });
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
-        contents:`List 10 most popular,most viewed,latest or all time favourite songs of these genres: ${userPreferences}. Only give the song name as a string array. Do not include any image links or URLs.`,
+        contents:`List 20 most popular,most viewed,latest or all time favourite songs of these genres: ${userPreferences}. Only give the song name as a string array. Do not include any image links or URLs.`,
         config: {
           responseMimeType: "application/json",
           responseSchema: {
@@ -107,7 +107,7 @@ export default function App() {
   setLoadingRecommendations(false);
   }
 
-  // Fetch "Try Something New" recommendations from Gemini
+  // fetching "Try Something New" recommendations from BAAS :)
   async function generateNewRecommendation(prefArr) {
     setLoadingNewRecommendations(true);
     try {

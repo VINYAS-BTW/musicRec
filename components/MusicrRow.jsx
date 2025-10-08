@@ -1,28 +1,51 @@
 "use client";
+import { useRef } from "react";
 import { motion } from "framer-motion";
-import { Music } from "lucide-react";
+import { Music, ThumbsUp, ThumbsDown, ChevronLeft, ChevronRight } from "lucide-react";
 
-export default function MusicRow({ title, items, icon: Icon, onLike, onDislike}) {
+export default function MusicRow({ title, items, icon: Icon, onLike, onDislike }) {
+  const scrollRef = useRef(null);
+
+  const scrollBy = (offset) => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: offset, behavior: "smooth" });
+    }
+  };
+
   return (
-    <div className="mb-12 font-nunito">
-      {/* Row Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <Icon className="w-6 h-6 text-indigo-500" />
-        <h2 className="text-2xl font-bold text-slate-900">{title}</h2>
-      </div>
+    <div className="mb-8 relative">
+      {/* horizontal scrolls  erdu buttons*/}
+      <button
+        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-md rounded-full p-2 hover:bg-slate-100 cursor-pointer"
+        onClick={() => scrollBy(-400)}
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+      <button
+        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white shadow-md rounded-full p-2 hover:bg-slate-100 cursor-pointer"
+        onClick={() => scrollBy(400)}
+      >
+        <ChevronRight className="w-5 h-5" />
+      </button>
 
-      {/* Scrollable Row */}
+      {/* hor row full divs */}
       <motion.div
+        ref={scrollRef}
         initial="hidden"
         animate="show"
         variants={{
           hidden: { opacity: 0 },
           show: {
             opacity: 1,
-            transition: { staggerChildren: 0.15 },
+            transition: { staggerChildren: 0.1 },
           },
         }}
-        className="flex overflow-x-auto gap-5 pb-4 scrollbar-hide"
+        className="flex overflow-x-auto gap-4 pb-4 scroll-smooth"
+        style={{
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch'
+        }}
       >
         {items.map((item, index) => (
           <motion.div
@@ -31,12 +54,10 @@ export default function MusicRow({ title, items, icon: Icon, onLike, onDislike})
               hidden: { opacity: 0, y: 20 },
               show: { opacity: 1, y: 0 },
             }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.97 }}
-            className="min-w-[180px] bg-white rounded-2xl shadow-md border border-slate-200 hover:shadow-lg transition-all cursor-pointer group"
+            className="min-w-[200px] cursor-pointer hover:shadow-2xl hover:translate-x-1 bg-white rounded-xl border border-slate-200 hover:border-slate-300 transition-all group flex-shrink-0"
           >
-            {/* Album Art or Placeholder */}
-            <div className="w-full aspect-square rounded-t-2xl overflow-hidden bg-gradient-to-br from-indigo-100 to-indigo-200 flex items-center justify-center">
+            {/* album galu */}
+            <div className="w-full aspect-square rounded-t-xl overflow-hidden bg-slate-100 flex items-center justify-center relative">
               {item.imagelinks ? (
                 <img
                   src={item.imagelinks}
@@ -44,36 +65,46 @@ export default function MusicRow({ title, items, icon: Icon, onLike, onDislike})
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <Music className="w-12 h-12 text-indigo-500 group-hover:scale-110 transition-transform" />
+                <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
+                  <Music className="w-12 h-12 text-slate-400" />
+                </div>
               )}
             </div>
 
-            {/* Info */}
-            <div className="p-4 text-center">
-              <p className="text-slate-900 font-semibold group-hover:text-indigo-600 transition-colors">
+            {/* album info galu */}
+            <div className="p-4">
+              <p className="text-slate-900 font-semibold text-sm mb-1 line-clamp-2 ">
                 {item.songName
                   ? item.songName
                   : typeof item === "string"
                   ? item
-                  : ""}
+                  : "Untitled"}
               </p>
               {item.genre && (
-                <p className="text-xs text-slate-500 mt-1">{item.genre}</p>
+                <p className="text-xs text-slate-500 mb-3">{item.genre}</p>
               )}
-              {/* You can add artist info if available */}
-              {/* Like/Dislike Buttons */}
-              <div className="flex justify-center gap-4 mt-2">
+              
+              {/* hu / huhu btns */}
+              <div className="flex gap-2 mt-3">
                 <button
-                  className="px-3 py-1 bg-green-100 text-green-700 rounded hover:bg-green-200"
-                  onClick={() => onLike(item)}
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-50 hover:bg-green-300 text-slate-700 rounded-lg transition-colors text-sm font-medium  cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onLike(item);
+                  }}
                 >
-                  👍 Like
+                  <ThumbsUp className="w-3.5 h-3.5" />
+                  <span>Like</span>
                 </button>
                 <button
-                  className="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200"
-                  onClick={() => onDislike(item)}
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-slate-50 hover:bg-red-300 text-slate-700 rounded-lg transition-colors text-sm font-medium cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDislike(item);
+                  }}
                 >
-                  👎 Dislike
+                  <ThumbsDown className="w-3.5 h-3.5" />
+                  <span>Pass</span>
                 </button>
               </div>
             </div>
@@ -81,15 +112,11 @@ export default function MusicRow({ title, items, icon: Icon, onLike, onDislike})
         ))}
       </motion.div>
 
-      {/*<style>{`
-        .scrollbar-hide::-webkit-scrollbar {
+      <style jsx>{`
+        div::-webkit-scrollbar {
           display: none;
         }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>*/}
+      `}</style>
     </div>
   );
 }
