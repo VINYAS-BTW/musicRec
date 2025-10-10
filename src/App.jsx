@@ -9,12 +9,14 @@ export default function App() {
   const [username, setUsername] = useState("");
   const [preferences, setPreferences] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
-  const [newRecommendations, setNewRecommendations] = useState([]); 
+  const [newRecommendations, setNewRecommendations] = useState([]); // NEW
   const [loadingRecommendations, setLoadingRecommendations] = useState(false);
  const [loadingNewRecommendations, setLoadingNewRecommendations] = useState(false);
- //const [dislikeCounts, setDislikeCounts] = useState({}); error barthidhe so ;)
+ //const [dislikeCounts, setDislikeCounts] = useState({});
 
-  //  log in
+
+
+  // When user logs in
   const handleLogin = async (name) => {
     try {
       const res = await fetch("http://localhost:5000/api/users/login", {
@@ -29,7 +31,7 @@ export default function App() {
 
       if (data.preferences && data.preferences.length > 0) {
         setCurrentPage("main");
-        generateRecommendation(data.preferences);
+        generateRecommendation(data.preferences, data.username);
         generateNewRecommendation(data.preferences); // NEW
       } else {
         setCurrentPage("preferences");
@@ -41,7 +43,7 @@ export default function App() {
     }
   };
 
-  // pref select
+  // When user sets preferences
   const handlePreferences = async (selected) => {
     setPreferences(selected);
     try {
@@ -58,18 +60,53 @@ export default function App() {
     setCurrentPage("main");
   };
 
-  // mathe ba
+  // When user goes back to login
   const handleGoBack = () => {
     setUsername("");
+    //updatePreferencesInDB(preferences);
     setPreferences([]);
     setRecommendations([]);
-    setNewRecommendations([]); 
+    setNewRecommendations([]); // NEW
     setCurrentPage("login");
     localStorage.removeItem("username");
   };
 
-  // namma rec fetching :)
-  async function generateRecommendation(prefArr) {
+async function generateRecommendation(prefArr, user = username) {
+  if (!user || !prefArr || prefArr.length === 0) {
+    setRecommendations([]);
+    setLoadingRecommendations(false);
+    return;
+  }
+  setLoadingRecommendations(true);
+  try {
+    const response = await fetch("http://127.0.0.1:8080/recommend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id: user, preferences: prefArr }),
+    });
+    const data = await response.json();
+    // Assume data.recommendations is an array of { song: "Song Name" }
+    const recommendationsWithInfo = await Promise.all(
+      (data.recommendations || []).map(async (rec) => {
+        const info = await fetchItunesInfo1(rec.song || rec.songName);
+        return {
+          songName: rec.song || rec.songName,
+          artist: info.artist,
+          genre: info.genre,
+          imagelinks: info.imagelinks,
+        };
+      })
+    );
+    setRecommendations(recommendationsWithInfo);
+  } catch (err) {
+    console.error(err);
+    setRecommendations([]);
+  }
+  setLoadingRecommendations(false);
+}
+
+  // Fetch recommendations from Gemini
+  /*async function generateRecommendation(prefArr) {
     setLoadingRecommendations(true);
     console.log("Generating recommendations for preferences:", prefArr);
     try {
@@ -77,7 +114,7 @@ export default function App() {
       const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API });
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
-        contents:`List 20 most popular,most viewed,latest or all time favourite songs of these genres: ${userPreferences}. Only give the song name as a string array. Do not include any image links or URLs.`,
+        contents:`List 10 most popular,most viewed,latest or all time favourite songs of these genres: ${userPreferences}. Only give the song name as a string array. Do not include any image links or URLs.`,
         config: {
           responseMimeType: "application/json",
           responseSchema: {
@@ -105,10 +142,11 @@ export default function App() {
     console.error("Error generating recommendations:", err);
   }
   setLoadingRecommendations(false);
-  }
+  }*/
 
-  // fetching "Try Something New" recommendations from BAAS :)
+  // Fetch "Try Something New" recommendations from Gemini
   async function generateNewRecommendation(prefArr) {
+  
     setLoadingNewRecommendations(true);
     try {
       const userPreferences = prefArr.join(", ");
@@ -157,11 +195,20 @@ function handleLike(item) {
   }
 }
 
+/*function handleDislike(item) {
+  // Remove genre from preferences
+  const updatedPrefs = preferences.filter(g => g !== item.genre);
+  setPreferences(updatedPrefs);
+
+  // Refetch recommendations with updated preferences
+  generateRecommendation(updatedPrefs, username);
+}*/
 
 function handleDislike(item) {
   if (item.genre) {
     const updated = preferences.filter(pref => pref !== item.genre);
     setPreferences(updated);
+    //generateRecommendation(updated, username);
     updatePreferencesInDB(updated);
   }
 }
@@ -214,6 +261,28 @@ async function fetchItunesInfo(songName) {
   };
 }
 
+
+async function fetchItunesInfo1(songName) {
+  const url = `https://itunes.apple.com/search?term=${encodeURIComponent(songName)}&entity=song&limit=1`;
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.results && data.results.length > 0) {
+      const result = data.results[0];
+      return {
+        imagelinks: result.artworkUrl100 || result.artworkUrl60,
+        artist: result.artistName || "",
+        genre: result.primaryGenreName || "",
+      };
+    }
+  } catch {}
+  return {
+    imagelinks: "https://upload.wikimedia.org/wikipedia/commons/6/6a/Music_Icon.png",
+    artist: "",
+    genre: "",
+  };
+}
+
   return (
     <div className="font-nunito antialiased">
       {currentPage === "login" && <Login onLogin={handleLogin} />}
@@ -233,6 +302,7 @@ async function fetchItunesInfo(songName) {
           onDislike={handleDislike}
         />
       )}
+      {currentPage !== "main" && <div>Loading or other page...</div>}
     </div>
   );
 }

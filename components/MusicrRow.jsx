@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Music, ThumbsUp, ThumbsDown, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function MusicRow({ title, items, icon: Icon, onLike, onDislike }) {
+  if (!Array.isArray(items)) items = [];
   const scrollRef = useRef(null);
 
   const scrollBy = (offset) => {

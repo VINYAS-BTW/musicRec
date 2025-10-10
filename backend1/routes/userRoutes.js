@@ -18,7 +18,7 @@ router.post("/login", async (req, res) => {
     let user = await User.findOne({ username });
     if (!user) user = await User.create({ username, preferences: [] });
 
-    res.status(200).json(user);
+    res.status(200).json({ username: user.username, preferences: user.preferences });
   } catch (err) {
     console.error(" Login Error:", err);
     res.status(500).json({ error: "Server error" });

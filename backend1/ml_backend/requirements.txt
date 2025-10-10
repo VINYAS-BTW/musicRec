@@ -1,0 +1,9 @@
+flask
+flask-cors
+tensorflow
+tensorflow-recommenders
+pandas
+numpy
+scikit-learn
+tqdm
+pymongo
